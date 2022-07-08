@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "momento-demo-severless-app"
+region = "us-west-2"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
