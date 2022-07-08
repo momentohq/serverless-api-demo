@@ -3,8 +3,10 @@ import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient, GetCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
 import {randomUUID} from "crypto";
 import {LogFormat, LogLevel, SimpleCacheClient} from '@gomomento/sdk';
+import {captureAWSv3Client, getSegment, Subsegment} from "aws-xray-sdk-core";
+import {metricScope, MetricsLogger, Unit} from "aws-embedded-metrics";
 
-export const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+export const ddbClient = captureAWSv3Client(DynamoDBDocumentClient.from(new DynamoDBClient({})));
 const defaultTtl = 60;
 const authToken = 'REPLACE_ME';
 const momento = new SimpleCacheClient(authToken, defaultTtl, {
@@ -19,10 +21,13 @@ interface User {
     name: String,
 }
 
-export const handler = async (
+
+export const handler = metricScope(metrics => async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     console.log(`processing request path: ${event.path} method: ${event.httpMethod}`)
+
+    const traceSeg = getSegment()?.addNewSubsegment("handler")
     try {
         switch (event.path) {
             case "/create-user":
@@ -36,14 +41,14 @@ export const handler = async (
             case "/users":
                 switch (event.httpMethod) {
                     case "GET":
-                        return handleGetUser(event)
+                        return handleGetUser(event, metrics)
                     default:
                         return gen404(event)
                 }
             case "/cached-users":
                 switch (event.httpMethod) {
                     case "GET":
-                        return handleGetCachedUser(event)
+                        return handleGetCachedUser(event, traceSeg, metrics)
                     default:
                         return gen404(event)
                 }
@@ -55,8 +60,12 @@ export const handler = async (
             statusCode: 500,
             body: JSON.stringify(e)
         }
+    } finally {
+        if (!traceSeg?.isClosed()) {
+            traceSeg?.close()
+        }
     }
-}
+});
 
 const handleNewUser = async (event: APIGatewayProxyEvent) => {
     if (!event.body) {
@@ -77,7 +86,7 @@ const handleNewUser = async (event: APIGatewayProxyEvent) => {
     }
 }
 
-const handleGetUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+const handleGetUser = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
     const userId = event.queryStringParameters?.['id']
     if (!userId) {
         return {
@@ -85,7 +94,9 @@ const handleGetUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
             body: "must pass user id to /users"
         }
     }
+    const startTime = Date.now()
     const user = await getUserDDB(userId)
+    mLogger.putMetric("ddb-get", Date.now() - startTime, Unit.Milliseconds)
     if (!user) {
         return {
             body: "",
@@ -98,7 +109,7 @@ const handleGetUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
     }
 }
 
-const handleGetCachedUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+const handleGetCachedUser = async (event: APIGatewayProxyEvent, trace: Subsegment | undefined, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
     const userId = event.queryStringParameters?.['id']
     if (!userId) {
         return {
@@ -106,8 +117,11 @@ const handleGetCachedUser = async (event: APIGatewayProxyEvent): Promise<APIGate
             body: "must pass user id to /cached-users"
         }
     }
+    const traceSeg = getSegment()?.addNewSubsegment('momento-get');
     const startTime = Date.now();
     let user = await getUserMomento(userId)
+    mLogger.putMetric("momento-get", Date.now() - startTime, Unit.Milliseconds)
+    traceSeg?.close()
     if (!user) {
         console.log("no user found in momento fetching from DDB")
         user = await getUserDDB(userId)

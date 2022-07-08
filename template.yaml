@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Globals:
+  Function:
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+
 Resources:
 
   UserTable:
@@ -18,6 +24,7 @@ Resources:
       Handler: app.handler
       Runtime: nodejs16.x
       Policies:
+        - AWSXrayWriteOnlyAccess
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
       Events:
