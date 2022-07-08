@@ -2,12 +2,11 @@
   "name": "momento-serverless-api-demo",
   "version": "1.0.0",
   "description": "Demo application showcasing Benefits of using Momento serverless cache",
-  "main": "app.js",
+  "main": "app.ts",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.121.0",
     "@aws-sdk/lib-dynamodb": "^3.121.0",
-    "@gomomento/sdk": "^0.13.1",
-    "pino-pretty": "^8.1.0"
+    "@gomomento/sdk": "^0.13.1"
   },
   "scripts": {
     "test": "mocha tests/unit/",

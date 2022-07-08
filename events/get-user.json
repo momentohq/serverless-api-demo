@@ -1,8 +1,11 @@
 {
-  "body": "{\"name\": \"Mo\", \"surname\":\"Squirrel\",\"age\":21}",
+  "body": "",
   "resource": "/{proxy+}",
-  "path": "/create-user",
-  "httpMethod": "POST",
+  "path": "/users",
+  "queryStringParameters": {
+    "id": "fdd0ec6c-9c1f-44ec-ab00-400571b3f8da"
+  },
+  "httpMethod": "GET",
   "isBase64Encoded": false,
   "headers": {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -44,7 +47,6 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "httpMethod": "POST",
     "apiId": "1234567890",
     "protocol": "HTTP/1.1"
   }

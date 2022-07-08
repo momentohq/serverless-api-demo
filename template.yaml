@@ -29,12 +29,12 @@ Resources:
         GetUser:
           Type: Api
           Properties:
-            Path: /get-user
+            Path: /users
             Method: GET
         GetCachedUser:
           Type: Api
           Properties:
-            Path: /get-cached-user
+            Path: /cached-users
             Method: GET
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild

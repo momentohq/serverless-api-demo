@@ -1,8 +1,8 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda/trigger/api-gateway-proxy";
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {DynamoDBDocumentClient, GetCommand, GetCommandInput, PutCommand} from "@aws-sdk/lib-dynamodb";
+import {DynamoDBDocumentClient, GetCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
 import {randomUUID} from "crypto";
-import {AlreadyExistsError, LogFormat, LogLevel, SimpleCacheClient,} from '@gomomento/sdk';
+import {LogFormat, LogLevel, SimpleCacheClient} from '@gomomento/sdk';
 
 export const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const defaultTtl = 60;
@@ -13,16 +13,16 @@ const momento = new SimpleCacheClient(authToken, defaultTtl, {
         format: LogFormat.JSON
     }
 });
-momento.createCache("momento-demo-users").catch(e => {
-    if (!e instanceof AlreadyExistsError) {
-        console.log("fatal error occurred creating momento cache" + e);
-    }
-});
 
+interface User {
+    id: String,
+    name: String,
+}
 
 export const handler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+    console.log(`processing request path: ${event.path} method: ${event.httpMethod}`)
     try {
         switch (event.path) {
             case "/create-user":
@@ -33,17 +33,17 @@ export const handler = async (
                         return gen404(event)
                 }
 
-            case "/get-user":
+            case "/users":
                 switch (event.httpMethod) {
                     case "GET":
                         return handleGetUser(event)
                     default:
                         return gen404(event)
                 }
-            case "/get-cached-user":
+            case "/cached-users":
                 switch (event.httpMethod) {
                     case "GET":
-                        return handleGetUser(event)
+                        return handleGetCachedUser(event)
                     default:
                         return gen404(event)
                 }
@@ -77,64 +77,69 @@ const handleNewUser = async (event: APIGatewayProxyEvent) => {
     }
 }
 
-const handleGetUser = async (event: APIGatewayProxyEvent) => {
+const handleGetUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const userId = event.queryStringParameters?.['id']
     if (!userId) {
         return {
             statusCode: 400,
-            body: "must pass user id to /get-cached-user"
+            body: "must pass user id to /users"
         }
     }
     const user = await getUserDDB(userId)
     if (!user) {
         return {
+            body: "",
             statusCode: 404
         }
     }
     return {
         statusCode: 200,
-        body: JSON.stringify(await getUserDDB(userId))
+        body: JSON.stringify(user)
     }
 }
 
-const handleGetCachedUser = async (event: APIGatewayProxyEvent) => {
+const handleGetCachedUser = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const userId = event.queryStringParameters?.['id']
     if (!userId) {
         return {
             statusCode: 400,
-            body: "must pass user id to /get-cached-user"
+            body: "must pass user id to /cached-users"
         }
     }
+    const startTime = Date.now();
     let user = await getUserMomento(userId)
     if (!user) {
+        console.log("no user found in momento fetching from DDB")
         user = await getUserDDB(userId)
+        // Set item in cache so next time can get faster
+        await momento.set("momento-demo-users", userId, JSON.stringify(user))
     }
     if (!user) {
         return {
+            body: "",
             statusCode: 404
         }
     }
-    // Set item in cache so next time can get faster
-    await momento.set("momento-demo-users", userId, JSON.stringify(user))
+
     return {
         statusCode: 200,
-        body: JSON.stringify(await getUserDDB(userId))
+        body: JSON.stringify(user)
     }
 }
 
-export const createUser = async (user) => {
+export const createUser = async (user: User) => {
     await ddbClient.send(new PutCommand({
         TableName: "momento-demo-users",
         Item: user,
     }));
 };
 
-export const getUserDDB = async (id) => {
+export const getUserDDB = async (id: string) => {
     const dbRsp = await ddbClient.send(new GetCommand({Key: {id}, TableName: "momento-demo-users"}));
     return dbRsp.Item
 };
 
-export const getUserMomento = async (id) => {
+export const getUserMomento = async (id: string) => {
     const rsp = await momento.get("momento-demo-users", id)
     const user = rsp.text()
     if (user == null) {
