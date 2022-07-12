@@ -1,14 +1,16 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda/trigger/api-gateway-proxy";
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient, GetCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
-import {randomUUID} from "crypto";
 import {LogFormat, LogLevel, SimpleCacheClient} from '@gomomento/sdk';
-import {captureAWSv3Client, getSegment, Subsegment} from "aws-xray-sdk-core";
 import {metricScope, MetricsLogger, Unit} from "aws-embedded-metrics";
 
-export const ddbClient = captureAWSv3Client(DynamoDBDocumentClient.from(new DynamoDBClient({})));
+// Constants ---
+const maxTestUsersToMake = 100
 const defaultTtl = 60;
 const authToken = 'REPLACE_ME';
+
+// Clients --
+export const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const momento = new SimpleCacheClient(authToken, defaultTtl, {
     loggerOptions: {
         level: LogLevel.DEBUG,
@@ -16,24 +18,24 @@ const momento = new SimpleCacheClient(authToken, defaultTtl, {
     }
 });
 
+// Models --
 interface User {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
+    followers: Array<string>,
 }
 
-
+// Router --
 export const handler = metricScope(metrics => async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
     console.log(`processing request path: ${event.path} method: ${event.httpMethod}`)
-
-    const traceSeg = getSegment()?.addNewSubsegment("handler")
     try {
         switch (event.path) {
-            case "/create-user":
+            case "/bootstrap-users":
                 switch (event.httpMethod) {
                     case "POST":
-                        return handleNewUser(event)
+                        return handleBootstrapTestUsers()
                     default:
                         return gen404(event)
                 }
@@ -48,7 +50,21 @@ export const handler = metricScope(metrics => async (
             case "/cached-users":
                 switch (event.httpMethod) {
                     case "GET":
-                        return handleGetCachedUser(event, traceSeg, metrics)
+                        return handleGetCachedUser(event, metrics)
+                    default:
+                        return gen404(event)
+                }
+            case "/followers":
+                switch (event.httpMethod) {
+                    case "GET":
+                        return handleGetFollowers(event, metrics)
+                    default:
+                        return gen404(event)
+                }
+            case "/cached-followers":
+                switch (event.httpMethod) {
+                    case "GET":
+                        return handleGetCachedFollowers(event, metrics)
                     default:
                         return gen404(event)
                 }
@@ -60,29 +76,25 @@ export const handler = metricScope(metrics => async (
             statusCode: 500,
             body: JSON.stringify(e)
         }
-    } finally {
-        if (!traceSeg?.isClosed()) {
-            traceSeg?.close()
-        }
     }
 });
 
-const handleNewUser = async (event: APIGatewayProxyEvent) => {
-    if (!event.body) {
-        return {
-            statusCode: 400,
-            body: "must pass user payload to /create-user"
+// handlers ----
+const handleBootstrapTestUsers = async () => {
+    const returnUsers: Array<User> = [];
+    for(let i = 1; i <= maxTestUsersToMake; i++){
+        const id = `${i}`;
+        const user: User = {
+            id,
+            name: genName(),
+            followers: genFollowers(id),
         }
+        await createUser(user)
+        returnUsers.push(user)
     }
-    const requestBody: { name: String } = JSON.parse(event.body)
-    const user = {
-        id: randomUUID(),
-        name: requestBody.name
-    }
-    await createUser(user)
     return {
         statusCode: 200,
-        body: JSON.stringify(user)
+        body: JSON.stringify(returnUsers)
     }
 }
 
@@ -94,9 +106,7 @@ const handleGetUser = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger
             body: "must pass user id to /users"
         }
     }
-    const startTime = Date.now()
-    const user = await getUserDDB(userId)
-    mLogger.putMetric("ddb-get", Date.now() - startTime, Unit.Milliseconds)
+    const user = await getUserDDB(userId, mLogger)
     if (!user) {
         return {
             body: "",
@@ -109,7 +119,7 @@ const handleGetUser = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger
     }
 }
 
-const handleGetCachedUser = async (event: APIGatewayProxyEvent, trace: Subsegment | undefined, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
+const handleGetCachedUser = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
     const userId = event.queryStringParameters?.['id']
     if (!userId) {
         return {
@@ -117,56 +127,165 @@ const handleGetCachedUser = async (event: APIGatewayProxyEvent, trace: Subsegmen
             body: "must pass user id to /cached-users"
         }
     }
-    const traceSeg = getSegment()?.addNewSubsegment('momento-get');
-    const startTime = Date.now();
-    let user = await getUserMomento(userId)
-    mLogger.putMetric("momento-get", Date.now() - startTime, Unit.Milliseconds)
-    traceSeg?.close()
-    if (!user) {
-        console.log("no user found in momento fetching from DDB")
-        user = await getUserDDB(userId)
-        // Set item in cache so next time can get faster
-        await momento.set("momento-demo-users", userId, JSON.stringify(user))
-    }
+    let user = await getCachedUser(userId, mLogger)
     if (!user) {
         return {
             body: "",
             statusCode: 404
         }
     }
-
     return {
         statusCode: 200,
         body: JSON.stringify(user)
     }
 }
 
-export const createUser = async (user: User) => {
+const handleGetFollowers = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
+    const userId = event.queryStringParameters?.['id']
+    if (!userId) {
+        return {
+            statusCode: 400,
+            body: "must pass user id to /followers"
+        }
+    }
+
+    const startTime = Date.now()
+    let user = await getUserDDB(userId, mLogger)
+    if (!user) {
+        return {
+            body: "",
+            statusCode: 404
+        }
+    }
+    const returnUserPromises: Array<Promise<User>> = []
+    user.followers.forEach((u => {
+        returnUserPromises.push(getUserDDB(u, mLogger))
+    }))
+    const rList = await resolveFollowersNames(returnUserPromises)
+    mLogger.putMetric("get-followers", Date.now() - startTime, Unit.Milliseconds)
+    return {
+        statusCode: 200,
+        body: JSON.stringify(rList)
+    }
+}
+
+const handleGetCachedFollowers = async (event: APIGatewayProxyEvent, mLogger: MetricsLogger): Promise<APIGatewayProxyResult> => {
+    const userId = event.queryStringParameters?.['id']
+    if (!userId) {
+        return {
+            statusCode: 400,
+            body: "must pass user id to /cached-followers"
+        }
+    }
+    const startTime = Date.now()
+    let user = await getCachedUser(userId, mLogger)
+    if (!user) {
+        return {
+            body: "",
+            statusCode: 404
+        }
+    }
+    const returnUserPromises: Array<Promise<User>> = []
+    user.followers.forEach((f => {
+        returnUserPromises.push(getCachedUser(f, mLogger))
+    }))
+
+    const rList = await resolveFollowersNames(returnUserPromises)
+    mLogger.putMetric("get-cached-followers", Date.now() - startTime, Unit.Milliseconds)
+    return {
+        statusCode: 200,
+        body: JSON.stringify(rList)
+    }
+}
+
+// --- internal
+const createUser = async (user: User) => {
     await ddbClient.send(new PutCommand({
         TableName: "momento-demo-users",
         Item: user,
     }));
 };
 
-export const getUserDDB = async (id: string) => {
+const getCachedUser  = async(userId: string, mLogger: MetricsLogger): Promise<User> => {
+    const startTime = Date.now();
+    let user = await getUserMomento(userId, mLogger)
+    if (!user) {
+        console.log("no user found in momento fetching from DDB")
+        user = await getUserDDB(userId, mLogger)
+        // Set item in cache so next time can get faster
+        await momento.set("momento-demo-users", userId, JSON.stringify(user))
+    }
+    return user
+}
+
+const getUserDDB = async (id: string, mLogger: MetricsLogger) => {
+    const startTime = Date.now()
     const dbRsp = await ddbClient.send(new GetCommand({Key: {id}, TableName: "momento-demo-users"}));
-    return dbRsp.Item
+    mLogger.putMetric("ddb-get", Date.now() - startTime, Unit.Milliseconds)
+    return dbRsp.Item as User
 };
 
-export const getUserMomento = async (id: string) => {
+const getUserMomento = async (id: string, mLogger: MetricsLogger) => {
+    const startTime = Date.now();
     const rsp = await momento.get("momento-demo-users", id)
     const user = rsp.text()
     if (user == null) {
         return null
     }
+    mLogger.putMetric("momento-get", Date.now() - startTime, Unit.Milliseconds)
     return JSON.parse(user)
 };
 
 
 // Utility ----------------
+async function resolveFollowersNames(userPromises: Array<Promise<User>>): Promise<Array<String>> {
+    const u = await Promise.all(userPromises)
+    const rList: Array<String> = []
+    u.forEach(ur => {
+        rList.push(ur.name)
+    })
+    return rList
+}
+
 function gen404(event: APIGatewayProxyEvent) {
     return {
         statusCode: 404,
         body: `${event.httpMethod}: ${event.path} not found`
     }
+}
+
+function genName(): string {
+    const firstNames = [
+        'excited', 'clingy', 'sad', 'happy', 'strange', 'scared', 'mystical', 'clingy',
+        'obnoxious', 'rare', 'dumb', 'goofy', 'angry', 'spacey', 'lazy', 'relaxed',
+    ]
+    const lastNames = [
+        'otter', 'wombat', 'zebra', 'elephant', 'squirrel', 'rabbit', 'frog',
+        'rino', 'lion', 'sloth', 'hamster', 'dog', 'cat', 'fish',
+    ]
+    return `${
+        capitalize(firstNames[getRandomInt(0, firstNames.length)])
+    } ${
+        capitalize(lastNames[getRandomInt(0, lastNames.length)])
+    }`;
+}
+
+function genFollowers(id: string): Array<string>{
+    const returnList = [];
+    const followerCount = getRandomInt(50,60)
+    for(let i = 0; i < followerCount; i ++){
+        const followToAdd = `${getRandomInt(1, maxTestUsersToMake)}`
+        if (followToAdd != id){
+            returnList.push(`${getRandomInt(1, maxTestUsersToMake)}`)
+        }
+    }
+    return returnList;
+}
+
+function capitalize(s: string) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function getRandomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min)) + min;
 }

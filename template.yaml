@@ -4,6 +4,7 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Tracing: Active
+    Timeout: 20
   Api:
     TracingEnabled: True
 
@@ -31,7 +32,7 @@ Resources:
         CreateUser:
           Type: Api
           Properties:
-            Path: /create-user
+            Path: /bootstrap-users
             Method: POST
         GetUser:
           Type: Api
@@ -43,10 +44,20 @@ Resources:
           Properties:
             Path: /cached-users
             Method: GET
+        GetFollowers:
+          Type: Api
+          Properties:
+            Path: /followers
+            Method: GET
+        GetCachedFollowers:
+          Type: Api
+          Properties:
+            Path: /cached-followers
+            Method: GET
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
-        Minify: true
+        Minify: false
         Target: "es2020"
         Sourcemap: true
         EntryPoints:

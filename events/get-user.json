@@ -3,7 +3,7 @@
   "resource": "/{proxy+}",
   "path": "/users",
   "queryStringParameters": {
-    "id": "fdd0ec6c-9c1f-44ec-ab00-400571b3f8da"
+    "id": 1
   },
   "httpMethod": "GET",
   "isBase64Encoded": false,

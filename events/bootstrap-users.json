@@ -1,7 +1,7 @@
 {
   "body": "{\"name\": \"Mo\", \"surname\":\"Squirrel\",\"age\":21}",
   "resource": "/{proxy+}",
-  "path": "/create-user",
+  "path": "/bootstrap-users",
   "httpMethod": "POST",
   "isBase64Encoded": false,
   "headers": {

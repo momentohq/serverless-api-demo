@@ -1,3 +1,4 @@
+import random
 from locust import HttpUser, task, between
 
 
@@ -6,8 +7,8 @@ class StartUser(HttpUser):
 
     @task
     def get_user(self):
-        self.client.get("/users?id=a1a843a9-ebc5-4ed6-ab1f-7e9a277f7c6f")
+        self.client.get("/followers?id=" + str(random.randint(1, 100)))
 
     @task
     def get_cached_user(self):
-        self.client.get("/cached-users?id=a1a843a9-ebc5-4ed6-ab1f-7e9a277f7c6f")
+        self.client.get("/cached-followers?id=" + str(random.randint(1, 100)))
