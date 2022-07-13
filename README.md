@@ -88,7 +88,7 @@ get-cached-followers
     1. Start synthetic test with `20` users and spawn rate of `5`
     2. Make sure to enter host you got from output of `sam deploy`
 14. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
-    1. _Be patient if metrics dont show up right away can take a minute at first._
+    1. _Be patient if metrics don't show up right away. It can take a few minutes at first._
 15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
 
