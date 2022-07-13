@@ -40,7 +40,7 @@ $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-follow
 ["mystical hamster","relaxed cat","happy squirrel","goofy cat","goofy lion","sad rino","happy zebra","excited elephant","mystical dog","strange rabbit","sad sloth","sad rino","lazy sloth","dumb frog","strange lion","mystical otter","angry squirrel","angry squirrel","sad rino","clingy hamster","rare sloth","strange hamster","happy rino","happy sloth","excited rino","clingy frog","goofy elephant","mystical hamster","excited elephant","mystical zebra","excited rino","lazy frog","excited dog","rare sloth","clingy cat","excited dog","clingy rabbit","spacey rabbit","sad rino","clingy lion","rare sloth","goofy cat","spacey zebra","mystical otter","relaxed sloth","relaxed squirrel","lazy dog","lazy rabbit","happy rino","goofy lion","mystical zebra","angry hamster","rare sloth"]%
 ```
 When deployed you will have an application that looks like this deployed into your account.
-![Image](./pics/arch.jpeg)
+![Arch](./pics/arch.jpeg)
 
 The lambda application will produce the following cloud watch metrics for you to compare in cloudwatch 
 ```text
@@ -64,23 +64,29 @@ get-cached-followers
 2. Change working directory to the repo you just cloned
     1. `cd serverless-api-demo`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
-4. Add your Momento Auth token you received previously in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) 
-   1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
+4. Update your Momento Auth token for `us-east-1` you received previously in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) update `REPLACE_ME`.
+   1. To get a new token run:
+      `momento account signup aws --region us-east-1 --email my-email@demo.com`
 5. Create a cache for demo with momento cli
    1. `momento configure --quick`
    2. `momento cache create --name momento-demo-users`
-6. Build the project
+6. Install Dependencies
+   1. `cd src && npm install && cd ..`
+7. Build the project
     1. `sam build --beta-features`
-7. Deploy the project into your AWS account
+8. Deploy the project into your AWS account
     1. `sam deploy --resolve-s3`
-8. Get the URL of your new API from cfn output shown after `sam deploy`
-9. Bootstrap test users
-   1. `curl -X POST https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/bootstrap-users`
-10. Start benchmark script
+9. Get the URL of your new API from cfn output shown after `sam deploy` and set in env variable.
+   1. ex: `export API_URL=https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod`
+      1. _Make sure to replace with your demo stack value `x949ucadkh` is just an example._
+10. Bootstrap test users
+    1. `curl -X POST "$API_URL/bootstrap-users"`
+11. Start benchmark script
      1. `cd bench && ./start.sh`
-11. Navigate to locust dashboard at http://0.0.0.0:8089/
-    1. Start synthetic test with 20 users and spawn rate of 5
+12. Navigate to locust dashboard at http://0.0.0.0:8089/
+    1. Start synthetic test with `20` users and spawn rate of `5`
     2. Make sure to enter host you got from output of `sam deploy`
-12. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
-13. Chart custom metrics to compare response times.
+13. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
+14. Chart custom metrics to compare response times.
+    ![Image](./pics/metrics.png)
 
