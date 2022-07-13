@@ -70,8 +70,6 @@ get-cached-followers
 5. Create a cache for demo with momento cli
    1. `momento configure --quick`
    2. `momento cache create --name momento-demo-users`
-6. Install Dependencies
-   1. `cd src && npm install && cd ..`
 7. Build the project
     1. `sam build --beta-features`
 8. Deploy the project into your AWS account
