@@ -89,7 +89,10 @@ The lambda application will produce these CloudWatch metrics for you to explore 
     1. _Be patient if metrics don't show up right away. It can take a few minutes at first._
 15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
-16. Stop load driver by stopping shell you ran `start.sh` in or from browser UI
-17. You can tear down infrastructure used for testing when you done with following command
+16. Try adjusting graph to see metrics better
+    1. Change the timespan from 3h to the last 10 minutes 
+    2. Set the period of metrics to 1-minute
+17. Stop load driver by stopping shell you ran `start.sh` in or from browser UI
+18. You can tear down infrastructure used for testing when you are done with following command
     1. `sam delete`
 
