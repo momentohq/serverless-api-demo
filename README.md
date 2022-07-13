@@ -32,9 +32,9 @@ $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\
 }
 ```
 
-##### GET /followers & /cached-followers
-Will make 1 call to either DDB or Momento for passed user id and then N 
-additional calls to either DDB or Momento to look up each follower name.
+#### GET /followers & /cached-followers
+Will make 1 call to either DynamoDB or Momento for passed user id and then N 
+additional calls to either DynamoDB or Momento to look up each follower name.
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers\?id\=1 -s
 ["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
