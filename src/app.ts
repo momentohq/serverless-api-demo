@@ -36,40 +36,32 @@ export const handler = metricScope(metrics => async (
                 switch (event.httpMethod) {
                     case "POST":
                         return handleBootstrapTestUsers()
-                    default:
-                        return gen404(event)
                 }
-
+                break;
             case "/users":
                 switch (event.httpMethod) {
                     case "GET":
                         return handleGetUser(event, metrics)
-                    default:
-                        return gen404(event)
                 }
+                break;
             case "/cached-users":
                 switch (event.httpMethod) {
                     case "GET":
                         return handleGetCachedUser(event, metrics)
-                    default:
-                        return gen404(event)
                 }
+                break;
             case "/followers":
                 switch (event.httpMethod) {
                     case "GET":
                         return handleGetFollowers(event, metrics)
-                    default:
-                        return gen404(event)
                 }
+                break;
             case "/cached-followers":
                 switch (event.httpMethod) {
                     case "GET":
                         return handleGetCachedFollowers(event, metrics)
-                    default:
-                        return gen404(event)
                 }
-            default:
-                return gen404(event)
+                break;
         }
     } catch (e) {
         return {
@@ -77,6 +69,7 @@ export const handler = metricScope(metrics => async (
             body: JSON.stringify(e)
         }
     }
+    return gen404(event)
 });
 
 // handlers ----
@@ -198,7 +191,7 @@ const handleGetCachedFollowers = async (event: APIGatewayProxyEvent, mLogger: Me
     }
 }
 
-// --- internal
+// DAO's ---
 const createUser = async (user: User) => {
     await ddbClient.send(new PutCommand({
         TableName: "momento-demo-users",
