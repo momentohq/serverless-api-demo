@@ -32,7 +32,7 @@ $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\
 }
 ```
 
-##### GET /followers & /cached-followers
+#### GET /followers & /cached-followers
 Will make 1 call to either DDB or Momento for passed user id and then N 
 additional calls to either DDB or Momento to look up each follower name.
 ```text
