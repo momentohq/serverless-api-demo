@@ -37,7 +37,7 @@ Will make 1 call to either DDB or Momento for passed user id and then N
 additional calls to either DDB or Momento to look up each follower name.
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers\?id\=1 -s
-["mystical hamster","relaxed cat","happy squirrel","goofy cat","goofy lion","sad rino","happy zebra","excited elephant","mystical dog","strange rabbit","sad sloth","sad rino","lazy sloth","dumb frog","strange lion","mystical otter","angry squirrel","angry squirrel","sad rino","clingy hamster","rare sloth","strange hamster","happy rino","happy sloth","excited rino","clingy frog","goofy elephant","mystical hamster","excited elephant","mystical zebra","excited rino","lazy frog","excited dog","rare sloth","clingy cat","excited dog","clingy rabbit","spacey rabbit","sad rino","clingy lion","rare sloth","goofy cat","spacey zebra","mystical otter","relaxed sloth","relaxed squirrel","lazy dog","lazy rabbit","happy rino","goofy lion","mystical zebra","angry hamster","rare sloth"]%
+["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
 ```
 When deployed you will have an application that looks like this deployed into your account.
 ![Arch](./pics/arch.jpeg)
@@ -57,7 +57,6 @@ get-cached-followers
 * [Local AWS Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 * [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
   * _Note: Make sure you are on latest version_
-* [Momento CLI and AuthToken for us-east-1](https://github.com/momentohq/momento-cli#quick-start)
 
 ## Tutorial
 1. Please clone this repo.
