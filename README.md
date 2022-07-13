@@ -5,7 +5,7 @@ Serverless Application that can be built and deployed with [SAM](https://docs.aw
 api. It contains the following endpoints:
 
 ```text
-# Generates base users in DDB to use for test 
+# Generate base users in DDB to use for test 
 POST /bootstrap-users
 
 # Get single user
@@ -22,7 +22,7 @@ Bootstraps all the test user data needed. For this demo it generates
 100 test users each following 50-60 random other test users.
 
 #### GET /users & /cached-users
-Makes either 1 call to DynamoDB or Momento
+Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=2 -s | jq .
 {
@@ -31,25 +31,23 @@ $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\
   "name": "Happy Wombat"
 }
 ```
+In case you don't have it already, [jq](https://stedolan.github.io/jq/) is a great tool for working with JSON.
 
 #### GET /followers & /cached-followers
-Will make 1 call to either DynamoDB or Momento for passed user id and then N 
-additional calls to either DynamoDB or Momento to look up each follower name.
+Will make 1 call to either DynamoDB (`/followers`) or Momento (`/cached-followers`) for the passed
+user id and then N additional calls to either DynamoDB or Momento to look up each follower name.
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers\?id\=1 -s
 ["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
 ```
-When deployed you will have an application that looks like this deployed into your account.
+When deployed you will have an application that looks like this in your account:
 ![Arch](./pics/arch.jpeg)
 
-The lambda application will produce the following cloud watch metrics for you to compare in cloudwatch 
-```text
-ddb-get
-momento-get
-
-get-followers
-get-cached-followers
-```
+The lambda application will produce these CloudWatch metrics for you to explore and contrast:
+|Momento|DynamoDB|
+|------|-----|
+|momento-get|ddb-get|
+|get-cached-followers|get-followers|
 
 ## Pre-reqs
 * [Docker](https://docs.docker.com/engine/install/)
