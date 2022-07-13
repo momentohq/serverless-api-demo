@@ -5,7 +5,7 @@ Serverless Application that can be built and deployed with [SAM](https://docs.aw
 api. It contains the following endpoints:
 
 ```text
-# Generates base users in DDB to use for test 
+# Generate base users in DDB to use for test 
 POST /bootstrap-users
 
 # Get single user
@@ -22,34 +22,32 @@ Bootstraps all the test user data needed. For this demo it generates
 100 test users each following 50-60 random other test users.
 
 #### GET /users & /cached-users
-Makes either 1 call to DynamoDB or Momento
+Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=2 -s | jq .
 {
   "id": "2",
   "followers": [ "36", "4", "21", "21", "69", "69", "60", "48", "20", "35", "57", "51", "37", "75", "61", "48", "69", "28", "60", "30", "41", "79", "75", "46", "21", "51", "37", "52", "76", "62", "11", "38", "98", "10", "15", "90", "5", "97", "70", "44", "88", "31", "76", "97", "48", "15", "85", "64", "93", "5"],
-  "name": "happy wombat"
+  "name": "Happy Wombat"
 }
 ```
+In case you don't have it already, [jq](https://stedolan.github.io/jq/) is a great tool for working with JSON.
 
 #### GET /followers & /cached-followers
-Will make 1 call to either DynamoDB or Momento for passed user id and then N 
-additional calls to either DynamoDB or Momento to look up each follower name.
+Will make 1 call to either DynamoDB (`/followers`) or Momento (`/cached-followers`) for the passed
+user id and then N additional calls to either DynamoDB or Momento to look up each follower name.
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers\?id\=1 -s
 ["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
 ```
-When deployed you will have an application that looks like this deployed into your account.
+When deployed you will have an application that looks like this in your account:
 ![Arch](./pics/arch.jpeg)
 
-The lambda application will produce the following cloud watch metrics for you to compare in cloudwatch 
-```text
-ddb-get
-momento-get
-
-get-followers
-get-cached-followers
-```
+The lambda application will produce these CloudWatch metrics for you to explore and contrast:
+|Momento|DynamoDB|
+|------|-----|
+|momento-get|ddb-get|
+|get-cached-followers|get-followers|
 
 ## Pre-reqs
 * [Docker](https://docs.docker.com/engine/install/)
@@ -88,7 +86,7 @@ get-cached-followers
     1. Start synthetic test with `20` users and spawn rate of `5`
     2. Make sure to enter host you got from output of `sam deploy`
 14. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
-    1. _Be patient if metrics dont show up right away can take a minute at first._
+    1. _Be patient if metrics don't show up right away. It can take a few minutes at first._
 15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
 16. Stop load driver by stopping shell you ran `start.sh` in or from browser UI
