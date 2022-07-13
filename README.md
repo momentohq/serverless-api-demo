@@ -1,7 +1,7 @@
 # Serverless Typescript API With Momento
 
-This tutorial shows a basic serverless typescript REST api using DynamoDB supercharged with momento. It contains a 
-Serverless Application that can be built and deployed with SAM cli. The API is supposed to represent a basic `users` 
+This tutorial shows a basic serverless typescript REST api using DynamoDB supercharged with [Momento](https://www.gomomento.com/). It contains a 
+Serverless Application that can be built and deployed with [SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) cli. The API is supposed to represent a basic `users` 
 api. It contains the following endpoints:
 
 ```text
