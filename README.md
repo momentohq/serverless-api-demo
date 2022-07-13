@@ -44,7 +44,7 @@ When deployed you will have an application that looks like this deployed into yo
 
 The lambda application will produce the following cloud watch metrics for you to compare in cloudwatch 
 ```text
-ddb-get # individual 
+ddb-get
 momento-get
 
 get-followers
