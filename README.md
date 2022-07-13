@@ -91,4 +91,7 @@ get-cached-followers
     1. _Be patient if metrics dont show up right away can take a minute at first._
 15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
+16. Stop load driver by stopping shell you ran `start.sh` in or from browser UI
+17. You can tear down infrastructure used for testing when you done with following command
+    1. `sam delete`
 
