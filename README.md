@@ -56,6 +56,7 @@ get-cached-followers
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 * [Local AWS Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 * [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+  * _Note: Make sure you are on latest version_
 * [Momento CLI and AuthToken for us-east-1](https://github.com/momentohq/momento-cli#quick-start)
 
 ## Tutorial
@@ -64,28 +65,31 @@ get-cached-followers
 2. Change working directory to the repo you just cloned
     1. `cd serverless-api-demo`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
-4. Update your Momento Auth token for `us-east-1` you received previously in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) update `REPLACE_ME`.
-   1. To get a new token run:
-      `momento account signup aws --region us-east-1 --email my-email@demo.com`
-5. Create a cache for demo with momento cli
+4. Install Momento CLI
+   1. `brew tap momentohq/tap` 
+   2. `brew install momento-cli`
+5. Obtain a momento auth token in us-east-1
+   1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
+6. Update your Momento Auth token for `us-east-1` in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) update `REPLACE_ME`.
+7. Create a cache for demo with momento cli
    1. `momento configure --quick`
    2. `momento cache create --name momento-demo-users`
-7. Build the project
+8. Build the project
     1. `sam build --beta-features`
-8. Deploy the project into your AWS account
+9. Deploy the project into your AWS account
     1. `sam deploy --resolve-s3`
-9. Get the URL of your new API from cfn output shown after `sam deploy` and set in env variable.
-   1. ex: `export API_URL=https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod`
-      1. _Make sure to replace with your demo stack value `x949ucadkh` is just an example._
-10. Bootstrap test users
+10. Get the URL of your new API from cfn output shown after `sam deploy` and set in env variable.
+    1. ex: `export API_URL=https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod`
+       1. _Make sure to replace with your demo stack value `x949ucadkh` is just an example._
+11. Bootstrap test users
     1. `curl -X POST "$API_URL/bootstrap-users"`
-11. Start benchmark script
+12. Start benchmark script
      1. `cd bench && ./start.sh`
-12. Navigate to locust dashboard at http://0.0.0.0:8089/
+13. Navigate to locust dashboard at http://0.0.0.0:8089/
     1. Start synthetic test with `20` users and spawn rate of `5`
     2. Make sure to enter host you got from output of `sam deploy`
-13. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
+14. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
     1. _Be patient if metrics dont show up right away can take a minute at first._
-14. Chart custom metrics to compare response times. 
+15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
 
