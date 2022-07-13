@@ -56,7 +56,7 @@ get-cached-followers
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 * [Local AWS Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 * [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* [Momento CLI and AuthToken](https://github.com/momentohq/momento-cli#quick-start)
+* [Momento CLI and AuthToken for us-east-1](https://github.com/momentohq/momento-cli#quick-start)
 
 ## Tutorial
 1. Please clone this repo.
