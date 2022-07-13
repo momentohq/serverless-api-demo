@@ -65,8 +65,10 @@ get-cached-followers
     1. `cd serverless-api-demo`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
 4. Add your Momento Auth token you received previously in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) 
+   1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
 5. Create a cache for demo with momento cli
-   1. `momento cache create --name momento-demo-users`
+   1. `momento configure --quick`
+   2. `momento cache create --name momento-demo-users`
 6. Build the project
     1. `sam build --beta-features`
 7. Deploy the project into your AWS account
