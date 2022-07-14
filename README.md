@@ -5,7 +5,7 @@ Serverless Application that can be built and deployed with [SAM](https://docs.aw
 api. It contains the following endpoints:
 
 ```text
-# Generate base users in DDB to use for test 
+# Generate base users in DynamoDB to use for test 
 POST /bootstrap-users
 
 # Get single user
@@ -65,7 +65,7 @@ The lambda application will produce these CloudWatch metrics for you to explore 
 4. Install Momento CLI
    1. `brew tap momentohq/tap` 
    2. `brew install momento-cli`
-5. Obtain a momento auth token in us-east-1
+5. Obtain a momento auth token in `us-east-1`
    1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
 6. Update your Momento Auth token for `us-east-1` in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) update `REPLACE_ME`.
 7. Create a cache for demo with momento cli
