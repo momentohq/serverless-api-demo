@@ -24,6 +24,7 @@ Resources:
       CodeUri: src
       Handler: app.handler
       Runtime: nodejs16.x
+      MemorySize: 2048
       Policies:
         - AWSXrayWriteOnlyAccess
         - DynamoDBCrudPolicy:
