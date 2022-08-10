@@ -6,7 +6,7 @@ import {metricScope, MetricsLogger, Unit} from "aws-embedded-metrics";
 
 // Constants ---
 const maxTestUsersToMake = 100
-const defaultTtl = 60;
+const defaultTtl = 3600;
 const authToken = 'REPLACE_ME';
 
 // Clients --
