@@ -19,7 +19,7 @@ GET /cached-followers?id=1
 
 #### POST /bootstrap-users
 Bootstraps all the test user data needed. For this demo it generates
-100 test users each following 50-60 random other test users.
+100 test users each following 5 random other test users.
 
 #### GET /users & /cached-users
 Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
@@ -27,7 +27,7 @@ Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=2 -s | jq .
 {
   "id": "2",
-  "followers": [ "36", "4", "21", "21", "69", "69", "60", "48", "20", "35", "57", "51", "37", "75", "61", "48", "69", "28", "60", "30", "41", "79", "75", "46", "21", "51", "37", "52", "76", "62", "11", "38", "98", "10", "15", "90", "5", "97", "70", "44", "88", "31", "76", "97", "48", "15", "85", "64", "93", "5"],
+  "followers": [ "36", "4", "21", "21", "69"],
   "name": "Happy Wombat"
 }
 ```
@@ -47,7 +47,7 @@ The lambda application will produce these CloudWatch metrics for you to explore 
 |Momento|DynamoDB|
 |------|-----|
 |momento-get|ddb-get|
-|get-cached-followers|get-followers|
+|momento-getfollowers|ddb-getfollowers|
 
 ## Pre-reqs
 * [Docker](https://docs.docker.com/engine/install/)

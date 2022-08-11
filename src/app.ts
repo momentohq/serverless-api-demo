@@ -155,7 +155,7 @@ const handleGetFollowers = async (event: APIGatewayProxyEvent, mLogger: MetricsL
         returnUserPromises.push(getUserDDB(u, mLogger))
     }))
     const rList = await resolveFollowersNames(returnUserPromises)
-    mLogger.putMetric("get-followers", Date.now() - startTime, Unit.Milliseconds)
+    mLogger.putMetric("ddb-getfollowers", Date.now() - startTime, Unit.Milliseconds)
     return {
         statusCode: 200,
         body: JSON.stringify(rList)
@@ -184,7 +184,7 @@ const handleGetCachedFollowers = async (event: APIGatewayProxyEvent, mLogger: Me
     }))
 
     const rList = await resolveFollowersNames(returnUserPromises)
-    mLogger.putMetric("get-cached-followers", Date.now() - startTime, Unit.Milliseconds)
+    mLogger.putMetric("momento-getfollowers", Date.now() - startTime, Unit.Milliseconds)
     return {
         statusCode: 200,
         body: JSON.stringify(rList)
@@ -265,7 +265,7 @@ function genName(): string {
 
 function genFollowers(id: string): Array<string>{
     const returnList = [];
-    const followerCount = getRandomInt(50,60)
+    const followerCount = 5
     for(let i = 0; i < followerCount; i ++){
         const followToAdd = `${getRandomInt(1, maxTestUsersToMake)}`
         if (followToAdd != id){
