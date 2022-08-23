@@ -24,7 +24,7 @@ Bootstraps all the test user data needed. For this demo it generates
 #### GET /users & /cached-users
 Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
 ```text
-$ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=2 -s | jq .
+$ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=1 -s | jq .
 {
   "id": "1",
   "followers": [
