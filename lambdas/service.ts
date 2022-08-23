@@ -18,13 +18,6 @@ const momento = new SimpleCacheClient(authToken, defaultTtl, {
     }
 });
 
-// Models --
-interface User {
-    id: string,
-    name: string,
-    followers: Array<string>,
-}
-
 // Router --
 export const handler = metricScope(metrics => async (
     event: APIGatewayProxyEvent

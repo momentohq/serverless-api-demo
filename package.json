@@ -1,0 +1,21 @@
+{
+  "name": "serverless-api-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "(cd lambdas && npm install);",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.7.1",
+    "aws-cdk": "^2.37.1",
+    "esbuild": "^0.15.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.37.1",
+    "constructs": "^10.1.72"
+  }
+}

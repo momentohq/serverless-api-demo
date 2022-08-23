@@ -1,7 +1,7 @@
 # Serverless Typescript API With Momento
 
 This tutorial shows a basic serverless typescript REST api using DynamoDB supercharged with [Momento](https://www.gomomento.com/). It contains a 
-Serverless Application that can be built and deployed with [SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) cli. The API is supposed to represent a basic `users` 
+Serverless Application that can be built and deployed with [CDK](https://aws.amazon.com/cdk/). The API is supposed to represent a basic `users` 
 api. It contains the following endpoints:
 
 ```text
@@ -26,9 +26,15 @@ Makes 1 call to DynamoDB (`/users`) or Momento (`/cached-users`)
 ```text
 $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-users\?id\=2 -s | jq .
 {
-  "id": "2",
-  "followers": [ "36", "4", "21", "21", "69"],
-  "name": "Happy Wombat"
+  "id": "1",
+  "followers": [
+    "63",
+    "60",
+    "81",
+    "18",
+    "60"
+  ],
+  "name": "Happy Sloth"
 }
 ```
 In case you don't have it already, [jq](https://stedolan.github.io/jq/) is a great tool for working with JSON.
@@ -50,32 +56,30 @@ The lambda application will produce these CloudWatch metrics for you to explore 
 |momento-getfollowers|ddb-getfollowers|
 
 ## Pre-reqs
-* [Docker](https://docs.docker.com/engine/install/)
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+* [NodeJs](https://nodejs.org/)
 * [Local AWS Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
-* [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-  * _Note: Make sure you are on latest version_
 
 ## Tutorial
 1. Please clone this repo.
     1. `git clone git@github.com:momentohq/serverless-api-demo.git`
-2. Change working directory to the repo you just cloned
+2. Change working directory to the repo you just cloned and install dependencies
     1. `cd serverless-api-demo`
+    2. `npm install`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
 4. Install Momento CLI
    1. `brew tap momentohq/tap` 
    2. `brew install momento-cli`
 5. Obtain a momento auth token in `us-east-1`
    1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
-6. Update your Momento Auth token for `us-east-1` in [app.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/app.ts#L10) update `REPLACE_ME`.
+6. Update your Momento Auth token for `us-east-1` in [service.ts](https://github.com/momentohq/serverless-api-demo/blob/main/lambdas/service.ts#L10) update `REPLACE_ME`.
 7. Create a cache for demo with momento cli
    1. `momento configure --quick`
    2. `momento cache create --name momento-demo-users`
 8. Build the project
-    1. `sam build --beta-features`
+    1. `npm run build`
 9. Deploy the project into your AWS account
-    1. `sam deploy --resolve-s3`
-10. Get the URL of your new API from cfn output shown after `sam deploy` and set in env variable.
+    1. `AWS_REGION=us-east-1 npm run cdk deploy`
+10. Get the URL of your new API from cfn output shown after `npm run cdk deploy` and set in env variable.
     1. ex: `export API_URL=https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod`
        1. _Make sure to replace with your demo stack value `x949ucadkh` is just an example._
 11. Bootstrap test users
@@ -85,7 +89,7 @@ The lambda application will produce these CloudWatch metrics for you to explore 
 13. Navigate to locust dashboard at http://0.0.0.0:8089/
     1. Start synthetic test with `20` users and spawn rate of `5`
     2. Make sure to enter host you got from output of `sam deploy`
-14. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embeded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
+14. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embedded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
     1. _Be patient if metrics don't show up right away. It can take a few minutes at first._
 15. Chart custom metrics to compare response times. 
     ![Image](./pics/metrics.png)
@@ -94,5 +98,5 @@ The lambda application will produce these CloudWatch metrics for you to explore 
     2. Set the period of metrics to 1-minute
 17. Stop load driver by stopping shell you ran `start.sh` in or from browser UI
 18. You can tear down infrastructure used for testing when you are done with following command
-    1. `sam delete`
+    1. `npm run cdk destroy`
 
