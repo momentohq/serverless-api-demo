@@ -1,10 +1,7 @@
-import {
-    LambdaIntegration,
-    RestApi
-} from 'aws-cdk-lib/aws-apigateway';
-import {AttributeType, Table} from 'aws-cdk-lib/aws-dynamodb';
+import {LambdaIntegration, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {AttributeType, BillingMode, Table} from 'aws-cdk-lib/aws-dynamodb';
 import {Runtime} from 'aws-cdk-lib/aws-lambda';
-import {App, Stack, RemovalPolicy, Duration} from 'aws-cdk-lib';
+import {App, Duration, RemovalPolicy, Stack} from 'aws-cdk-lib';
 import {NodejsFunction, NodejsFunctionProps} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {join} from 'path'
 
@@ -18,6 +15,7 @@ export class DemoServerlessApiStack extends Stack {
                 type: AttributeType.STRING
             },
             tableName: 'momento-demo-users',
+            billingMode: BillingMode.PAY_PER_REQUEST,
             removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
         });
 
