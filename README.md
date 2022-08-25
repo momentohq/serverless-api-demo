@@ -90,7 +90,7 @@ The lambda application will produce these CloudWatch metrics for you to explore 
      1. `cd bench && ./start.sh`
 14. Navigate to locust dashboard at http://0.0.0.0:8089/
     1. Start synthetic test with `20` users and spawn rate of `5`
-    2. Make sure to enter host you got from output of `sam deploy`
+    2. Make sure to enter host you got from output of `npm run cdk deploy`
 15. Open AWS Cloudwatch Metrics service in your aws account and Look for [aws-embedded-metrics](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#metricsV2:graph=~();namespace=~'aws-embedded-metrics) under the 'custom' metric namespace
     1. _Be patient if metrics don't show up right away. It can take a few minutes at first._
 16. Chart custom metrics to compare response times. 
