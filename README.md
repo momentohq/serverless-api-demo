@@ -56,7 +56,7 @@ We have a granular Upstream ProcessingTime metric for Momento and DynamoDB respo
 ![UpstreamMetrics](./pics/upstream-metrics.png)
 
 As well as top level API response time metrics for all our exposed APIs
-![APIMetrics](./pics/upstream-metrics.png)
+![APIMetrics](./pics/api-metrics.png)
 
 ## Pre-reqs
 * [NodeJs](https://nodejs.org/)
