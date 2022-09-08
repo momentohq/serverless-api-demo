@@ -9,12 +9,12 @@ api. It contains the following endpoints:
 POST /bootstrap-users
 
 # Get single user
-GET /users?id=1
-GET /cached-users?id=1
+GET /users/1
+GET /cached-users/1
 
 # Get passed users followers names
-GET /followers?id=1
-GET /cached-followers?id=1
+GET /followers/1
+GET /cached-followers/1
 ```
 
 #### POST /bootstrap-users
@@ -43,17 +43,20 @@ In case you don't have it already, [jq](https://stedolan.github.io/jq/) is a gre
 Will make 1 call to either DynamoDB (`/followers`) or Momento (`/cached-followers`) for the passed
 user id and then N additional calls to either DynamoDB or Momento to look up each follower name.
 ```text
-$ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers\?id\=1 -s
+$ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-followers/1 -s
 ["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
 ```
 When deployed you will have an application that looks like this in your account:
 ![Arch](./pics/arch.jpeg)
 
-The lambda application will produce these CloudWatch metrics for you to explore and contrast:
-|Momento|DynamoDB|
-|------|-----|
-|momento-get|ddb-get|
-|momento-getfollowers|ddb-getfollowers|
+The lambda application will produce several CloudWatch metrics for you to explore and contrast once you start 
+driving load. 
+
+We have a granular Upstream ProcessingTime metric for Momento and DynamoDB response times
+![UpstreamMetrics](./pics/upstream-metrics.png)
+
+As well as top level API response time metrics for all our exposed APIs
+![APIMetrics](./pics/upstream-metrics.png)
 
 ## Pre-reqs
 * [NodeJs](https://nodejs.org/)

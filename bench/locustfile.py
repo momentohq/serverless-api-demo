@@ -7,8 +7,8 @@ class StartUser(HttpUser):
 
     @task
     def get_user(self):
-        self.client.get("/followers?id=" + str(random.randint(1, 100)))
+        self.client.get("/followers/" + str(random.randint(0, 99)))
 
     @task
     def get_cached_user(self):
-        self.client.get("/cached-followers?id=" + str(random.randint(1, 100)))
+        self.client.get("/cached-followers/" + str(random.randint(0, 99)))

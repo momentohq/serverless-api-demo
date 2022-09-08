@@ -10,3 +10,4 @@ cdk.out
 cdk.context.json
 
 .idea
+__pycache__/

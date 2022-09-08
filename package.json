@@ -2,7 +2,7 @@
   "name": "serverless-api-demo",
   "version": "1.0.0",
   "scripts": {
-    "postinstall": "(cd lambdas && npm install);",
+    "postinstall": "(cd src && npm install);",
     "build": "tsc",
     "watch": "tsc -w",
     "cdk": "cdk"
