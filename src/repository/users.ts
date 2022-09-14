@@ -4,7 +4,7 @@ import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {LogFormat, LogLevel, SimpleCacheClient} from "@gomomento/sdk";
 
 const defaultTtl = 3600;
-const authToken = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJlYXdAbW9tZW50b2hxLmNvbSIsImNwIjoiY29udHJvbC5jZWxsLXVzLWVhc3QtMS0xLnByb2QuYS5tb21lbnRvaHEuY29tIiwiYyI6ImNhY2hlLmNlbGwtdXMtZWFzdC0xLTEucHJvZC5hLm1vbWVudG9ocS5jb20ifQ.ZSXM4VfnCDvqmFXni9DqRBY1vi6XBwpYE5EFkVXDN4QLm6gt2f-GQIGcxi5H65InOOpBWVM1bERfYMPEDzJpjA';
+const authToken = 'REPLACE_ME';
 
 // Clients --
 export const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
