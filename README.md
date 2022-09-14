@@ -76,7 +76,7 @@ As well as top level API response time metrics for all our exposed APIs
    2. `brew install momento-cli`
 6. Obtain a momento auth token in `us-east-1`
    1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
-7. Update your Momento Auth token for `us-east-1` in [service.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users.ts#L7) update `REPLACE_ME`.
+7. Update your Momento Auth token for `us-east-1` in [src/repository/users.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users.ts#L7) update `REPLACE_ME`.
 8. Create a cache for demo with momento cli
    1. `momento configure --quick`
    2. `momento cache create --name momento-demo-users`
