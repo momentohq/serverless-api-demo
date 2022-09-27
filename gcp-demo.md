@@ -1,4 +1,4 @@
-Follow this guide for deploying and benchmarking the demo API in your GCP Account
+Follow this guide for deploying and benchmarking the demo API in your GCP Account using Cloud Run, Firestore, Momento, and Pulumi to deploy it!
 
 ## Pre-reqs
 * [NodeJs](https://nodejs.org/)
