@@ -4,12 +4,17 @@
     "strict": true,
     "preserveConstEnums": true,
     "noEmit": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "module":"es2015",
     "moduleResolution":"node",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.json"
+  ],
+  "exclude": ["node_modules", "**/*.test.ts"],
 }

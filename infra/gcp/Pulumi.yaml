@@ -1,0 +1,9 @@
+name: momento-gcp-cloudrun-api-demo
+runtime: nodejs
+description: Google Cloud Run example using momento serverless cache
+template:
+  config:
+    gcp:project:
+      description: The Google Cloud project to deploy into
+    gcp:region:
+      description: The Google Cloud region

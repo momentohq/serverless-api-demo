@@ -1,8 +1,11 @@
 import {AuthorizerRequest} from "../models/authorizer";
-import {getCachedUser} from "../repository/users";
+import {DefaultClient} from "../repository/users/users";
+import {UsersDdb} from "../repository/users/data-clients/ddb";
 
 const ALLOW = 'Allow'
 const DENY = 'Deny'
+
+const ur = new DefaultClient(new UsersDdb());
 
 const customAuthzLogic = async (authToken: string, requestedUserId: string): Promise<any> => {
     // Note: in a real api we would want to do an authN check first against passed 'authToken' to get
@@ -11,7 +14,7 @@ const customAuthzLogic = async (authToken: string, requestedUserId: string): Pro
 
     // Now perform custom app Authz logic here were checking if the requesting user is a follower of the
     // requested profile pic owner based off path parameter in api for resource.
-    const user = await getCachedUser(requestedUserId) // TODO build way to toggle between cache on and off
+    const user = await ur.getCachedUser(requestedUserId) // TODO build way to toggle between cache on and off
     if (user.followers.indexOf(authToken) < 0) {
         console.info(`non follower tried to access a profile pic requestedUserId=${user.id} requestingUser=${authToken}`);
         throw new Error('cant access users profile pic who your not following');

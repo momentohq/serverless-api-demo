@@ -27,6 +27,9 @@ export class DemoServerlessApiStack extends Stack {
 
 
         const nodeJsFunctionProps: NodejsFunctionProps = {
+            environment: {
+                "RUNTIME": "AWS",
+            },
             bundling: {
                 externalModules: [
                     'aws-sdk', // Use the 'aws-sdk' available in the Lambda runtime
@@ -40,13 +43,13 @@ export class DemoServerlessApiStack extends Stack {
 
         // Create a Lambda function for handling service requests
         const serviceLambda = new NodejsFunction(this, 'ServiceLambda', {
-            entry: join(__dirname, 'src/handlers', 'service.ts'),
+            entry: join(__dirname, '../../src/handlers', 'service.ts'),
             ...nodeJsFunctionProps,
         });
 
         // Lambda for custom authorizer
         const customAuthzLambda = new NodejsFunction(this, 'CustomAuthzFunction', {
-            entry: join(__dirname, 'src/handlers', 'isFollowerAuthorizer.ts'),
+            entry: join(__dirname, '../../src/handlers', 'isFollowerAuthorizer.ts'),
             ...nodeJsFunctionProps,
         });
 

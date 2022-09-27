@@ -11,3 +11,7 @@ cdk.context.json
 
 .idea
 __pycache__/
+dist
+
+Pulumi.*.yaml
+/.pulumi/

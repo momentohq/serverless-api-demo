@@ -2,14 +2,15 @@
   "name": "momento-serverless-api-demo",
   "version": "1.0.0",
   "description": "Demo application showcasing Benefits of using Momento serverless cache",
-  "main": "app.ts",
+  "main": "service/app.ts",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.121.0",
     "@aws-sdk/lib-dynamodb": "^3.121.0",
     "@gomomento/sdk": "0.14.3",
+    "@google-cloud/firestore": "^6.2.0",
+    "@google-cloud/monitoring": "^3.0.1",
     "@vendia/serverless-express": "^4.3.10",
     "aws-embedded-metrics": "^2.0.5",
-    "aws-xray-sdk-core": "^3.3.6",
     "axios": "^0.27.2",
     "express": "^4.17.1",
     "response-time": "^2.3.2",
@@ -17,7 +18,9 @@
   },
   "scripts": {
     "test": "mocha tests/unit/",
-    "compile": "tsc"
+    "compile": "tsc",
+    "compile-service": "esbuild service/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "start": "NODE_OPTIONS=--enable-source-maps node dist/index.js"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.92",
