@@ -45,5 +45,5 @@ $ curl https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod/cached-follow
 ["Dumb Rabbit","Excited Wombat","Lazy Squirrel","Lazy Sloth","Strange Rabbit","Lazy Squirrel","Mystical Dog","Strange Cat","Dumb Dog","Excited Dog","Clingy Lion","Strange Frog","Strange Rabbit","Lazy Frog","Happy Sloth","Happy Sloth","Sad Cat","Clingy Cat","Happy Sloth","Obnoxious Fish","Excited Lion","Spacey Frog","Goofy Dog","Goofy Dog","Happy Hamster","Obnoxious Dog","Sad Cat","Obnoxious Lion","Happy Sloth","Obnoxious Otter","Angry Dog","Sad Rabbit","Excited Fish","Dumb Hamster","Clingy Otter","Angry Dog","Happy Hamster","Happy Hamster","Clingy Hamster","Happy Sloth","Happy Dog","Spacey Wombat","Clingy Lion","Clingy Sloth","Clingy Hamster","Rare Lion","Spacey Wombat","Angry Rabbit","Mystical Zebra","Excited Frog","Happy Dog","Angry Dog","Spacey Wombat"]%
 ```
 
-To deploy and benchmark this demo in AWS please continue [here](./aws-demo.md)!
-To deploy and benchmark this demo in GCP please continue [here](./gcp-demo.md)!
+#### To deploy and benchmark this demo in AWS please continue [here](./aws-demo.md)!
+#### To deploy and benchmark this demo in GCP please continue [here](./gcp-demo.md)!
