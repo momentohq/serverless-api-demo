@@ -41,6 +41,10 @@ router.get("/cached-followers/:userId", async (req: Request, res: Response) => {
 router.get("/profile-pic/:userId", async (req: Request, res: Response) => {
     return res.json(await uh.handleGetProfilePic(req.params.userId));
 });
+router.get("/cached-profile-pic/:userId", async (req: Request, res: Response) => {
+    return res.json(await uh.handleGetCachedProfilePic(req.params.userId));
+});
+
 
 // Make app use router we just initialized
 app.use("/", router);

@@ -35,7 +35,7 @@ export class DemoServerlessApiStack extends Stack {
                     'aws-sdk', // Use the 'aws-sdk' available in the Lambda runtime
                 ],
             },
-            depsLockFilePath: join(__dirname, 'src', 'package-lock.json'),
+            depsLockFilePath: join(__dirname, '..', '..', 'src', 'package-lock.json'),
             runtime: Runtime.NODEJS_16_X,
             memorySize: 2048, // Increase memory to help with response times
             timeout: Duration.seconds(10) // Make timeout longer for bootstrap api
@@ -43,16 +43,9 @@ export class DemoServerlessApiStack extends Stack {
 
         // Create a Lambda function for handling service requests
         const serviceLambda = new NodejsFunction(this, 'ServiceLambda', {
-            entry: join(__dirname, '../../src/handlers', 'service.ts'),
+            entry: join(__dirname, '../../src/functions', 'serviceHandler.ts'),
             ...nodeJsFunctionProps,
         });
-
-        // Lambda for custom authorizer
-        const customAuthzLambda = new NodejsFunction(this, 'CustomAuthzFunction', {
-            entry: join(__dirname, '../../src/handlers', 'isFollowerAuthorizer.ts'),
-            ...nodeJsFunctionProps,
-        });
-
 
         // Grant the Lambda function access to the DynamoDB table
         dynamoTable.grantReadWriteData(serviceLambda);
@@ -68,15 +61,41 @@ export class DemoServerlessApiStack extends Stack {
             defaultIntegration: svcLambdaIntegration,
         })
 
-        // Add profile-img api with custom followers only authorizer
+        // Custom Authorizers Demo Resources -----
+
+        // Lambda for custom authorizer with cache
+        const customAuthLambdaWithCache = new NodejsFunction(this, 'CustomAuthFunctionWithCache', {
+            entry: join(__dirname, '../../src/functions', 'isFollowerAuthorizer.ts'),
+            ...nodeJsFunctionProps,
+            environment: {
+                "RUNTIME": "AWS",
+                "CACHE_ENABLED": "true"
+            }
+        });
+        // Lambda for custom authorizer with no cache
+        const customAuthLambdaNoCache = new NodejsFunction(this, 'CustomAuthFunctionNoCache', {
+            entry: join(__dirname, '../../src/functions', 'isFollowerAuthorizer.ts'),
+            ...nodeJsFunctionProps,
+            environment: {
+                "RUNTIME": "AWS",
+                "CACHE_ENABLED": "false"
+            }
+        });
+
+        // Read perms for lambdas
+        dynamoTable.grantReadData(customAuthLambdaWithCache);
+        dynamoTable.grantReadData(customAuthLambdaNoCache);
+
+
+        // Add profile-img api with custom authorizer that does not use caching
         api.root.addResource('profile-pic').addResource('{id}',
             {
                 defaultMethodOptions: {
                     authorizationType: AuthorizationType.CUSTOM,
-                    authorizer: new RequestAuthorizer(this, 'IsFollowerAuthorizer', {
-                        authorizerName: 'authenticated-and-friends',
-                        handler: customAuthzLambda,
-                        // Don't cache at GW level we want follower updates enforced as quickly as possible
+                    authorizer: new RequestAuthorizer(this, 'IsFollowerAuthorizerNoCache', {
+                        authorizerName: 'authenticated-and-friends-no-cache',
+                        handler: customAuthLambdaNoCache,
+                        // Don't cache at GW level we want follower updates enforced as quickly as possible for this demo
                         resultsCacheTtl: Duration.seconds(0),
                         identitySources: [
                             IdentitySource.header("Authorization"),
@@ -84,8 +103,24 @@ export class DemoServerlessApiStack extends Stack {
                     })
                 },
             }
-        ).addMethod("GET", svcLambdaIntegration)
-
+        ).addMethod("GET", svcLambdaIntegration);
+        // Add cached-profile-img api with custom authorizer that does use caching
+        api.root.addResource('cached-profile-pic').addResource('{id}',
+            {
+                defaultMethodOptions: {
+                    authorizationType: AuthorizationType.CUSTOM,
+                    authorizer: new RequestAuthorizer(this, 'IsFollowerAuthorizerWithCache', {
+                        authorizerName: 'authenticated-and-friends-with-cache',
+                        handler: customAuthLambdaWithCache,
+                        // Don't cache at GW level we want follower updates enforced as quickly as possible for this demo
+                        resultsCacheTtl: Duration.seconds(0),
+                        identitySources: [
+                            IdentitySource.header("Authorization"),
+                        ]
+                    })
+                },
+            }
+        ).addMethod("GET", svcLambdaIntegration);
     }
 }
 
