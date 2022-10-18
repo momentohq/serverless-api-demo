@@ -6,7 +6,7 @@ import IMetric = google.api.IMetric;
 
 
 export class GcpMetricStore implements MetricRecorder {
-    private readonly metrics: Array<Metrics>
+    private metrics: Array<Metrics>
     private client = new monitoring.MetricServiceClient({
         fallback: "rest" // Use REST instead of GRPC since can't get esbuild to work w/ grpc and how they load protos >:(
     });
@@ -17,8 +17,11 @@ export class GcpMetricStore implements MetricRecorder {
 
     flush(): void {
         const mToFlush: Array<ITimeSeries> = [];
+        const me = this.metrics
+        // reset internal metric store so dont send duplicate
+        this.metrics = [];
         // Build up metrics to flush
-        for (const m of this.metrics) {
+        for (const m of me) {
             // Add dimensions
             const dimensions: IMetric["labels"] = {};
             for (const l of m.labels) {
@@ -36,6 +39,7 @@ export class GcpMetricStore implements MetricRecorder {
             })
 
         }
+
         this.client.createTimeSeries({
             name: this.client.projectPath(process.env['PROJECT_ID']!!),
             timeSeries: mToFlush,

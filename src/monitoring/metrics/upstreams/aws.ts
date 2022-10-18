@@ -2,15 +2,18 @@ import {createMetricsLogger, Unit} from "aws-embedded-metrics";
 import {MetricRecorder, Metrics} from "../metricRecorder";
 
 export class AwsMetricStore implements MetricRecorder {
-    private readonly metrics: Array<Metrics>
+    private metrics: Array<Metrics>
 
     constructor() {
         this.metrics = []
     }
 
     flush(): void {
+        const me = this.metrics
+        // reset internal metric store so dont send duplicate
+        this.metrics = [];
         // Build up metrics to flush
-        for (const m of this.metrics) {
+        for (const m of me) {
             const mLogger = createMetricsLogger();
             // Add dimensions
             const dimensions: Array<Record<string, string>> = [];
