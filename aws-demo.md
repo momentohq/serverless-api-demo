@@ -7,7 +7,7 @@ Follow this guide for deploying and benchmarking the demo API in your AWS Accoun
 
 When deployed you will have an application that looks like this in your account:
 
-![Arch](./pics/arch.jpeg)
+![Arch](./pics/arch-aws.jpeg)
 
 The lambda application will produce several CloudWatch metrics for you to explore and contrast once you start
 driving load.
