@@ -26,27 +26,27 @@ As well as top level API response time metrics for all our exposed APIs
     2. `npm install`
     3. `cd ..`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
-4. If you have not done previously bootstrap your aws account for CDK in `us-east-1`
-    1. `cd infra/aws`
-    2. `AWS_REGION=us-east-1 npm run cdk bootstrap`
-5. Install Momento CLI
+4. Install Momento CLI
     1. `brew tap momentohq/tap`
     2. `brew install momento-cli`
-6. Obtain a momento auth token in `us-east-1`
+5. Obtain a momento auth token in `us-east-1`
     1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
-7. Update your Momento Auth token for `us-east-1` in [src/repository/users.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users.ts#L7) update `REPLACE_ME`.
-8. Create a cache for demo with momento cli
+6. Update your Momento Auth token for `us-east-1` in [src/repository/users.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users.ts#L7) update `REPLACE_ME`.
+7. Create a cache for demo with momento cli
     1. `momento configure --quick`
     2. `momento cache create --name momento-demo-users`
-9. Build the cdk infra project
+8. Build the cdk infra project
     1. `npm run build`
+9. If you have not done previously bootstrap your aws account for CDK in `us-east-1`
+    1. `cd infra/aws`
+    2. `AWS_REGION=us-east-1 npm run cdk bootstrap`
 10. Deploy the project into your AWS account
     1. `AWS_REGION=us-east-1 npm run cdk deploy`
 11. Get the URL of your new API from cfn output shown after `npm run cdk deploy` and set in env variable.
     1. ex: `export API_URL=https://x949ucadkh.execute-api.us-east-1.amazonaws.com/Prod`
         1. _Make sure to replace with your demo stack value `x949ucadkh` is just an example._
 12. Bootstrap test users
-    1. `curl -X POST "$API_URL/bootstrap-users"`
+    1. `curl -X POST "$API_URL/bootstrap"`
 13. Start benchmark script
     1. `cd bench && ./start.sh`
 14. Navigate to locust dashboard at http://0.0.0.0:8089/
