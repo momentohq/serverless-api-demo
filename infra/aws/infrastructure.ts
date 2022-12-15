@@ -38,7 +38,7 @@ export class DemoServerlessApiStack extends Stack {
             depsLockFilePath: join(__dirname, '..', '..', 'src', 'package-lock.json'),
             runtime: Runtime.NODEJS_16_X,
             memorySize: 2048, // Increase memory to help with response times
-            timeout: Duration.seconds(10) // Make timeout longer for bootstrap api
+            timeout: Duration.seconds(30) // Make timeout longer for bootstrap api
         }
 
         // Create a Lambda function for handling service requests
