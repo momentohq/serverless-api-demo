@@ -1,9 +1,11 @@
 Follow this guide for deploying and benchmarking the demo API in your AWS Account
 
 ## Pre-reqs
-* [NodeJs](https://nodejs.org/)
+* [Node.js](https://nodejs.org/)
 * [Local AWS Credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)
 * [Docker](https://www.docker.com/)
+* [TypeScript](https://www.typescriptlang.org/id/download)
+* [CDK](https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html)
 
 When deployed you will have an application that looks like this in your account:
 
@@ -27,19 +29,18 @@ As well as top level API response time metrics for all our exposed APIs
     3. `cd ..`
 3. Make sure you have your local AWS credentials configured. Please see [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) for more info on getting started.
 4. Install Momento CLI
-    1. `brew tap momentohq/tap`
-    2. `brew install momento-cli`
+    1. Follow [instructions for your OS](https://docs.momentohq.com/getting-started#install-the-momento-command-line-interface-cli)
 5. Obtain a momento auth token in `us-east-1`
     1. `momento account signup aws --region us-east-1 --email my-email@demo.com`
-6. Update your Momento Auth token for `us-east-1` in [src/repository/users.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users.ts#L7) update `REPLACE_ME`.
+6. Update your Momento Auth token for `us-east-1` in [src/repository/users/users.ts](https://github.com/momentohq/serverless-api-demo/blob/main/src/repository/users/users.ts#L7) update `REPLACE_ME`.
 7. Create a cache for demo with momento cli
     1. `momento configure --quick`
     2. `momento cache create --name momento-demo-users`
 8. Build the cdk infra project
-    1. `npm run build`
-9. If you have not done previously bootstrap your aws account for CDK in `us-east-1`
     1. `cd infra/aws`
-    2. `AWS_REGION=us-east-1 npm run cdk bootstrap`
+    2. `npm run build`
+9. If you have not done previously bootstrap your aws account for CDK in `us-east-1`
+    1. `AWS_REGION=us-east-1 npm run cdk bootstrap`
 10. Deploy the project into your AWS account
     1. `AWS_REGION=us-east-1 npm run cdk deploy`
 11. Get the URL of your new API from cfn output shown after `npm run cdk deploy` and set in env variable.
@@ -48,7 +49,8 @@ As well as top level API response time metrics for all our exposed APIs
 12. Bootstrap test users
     1. `curl -X POST "$API_URL/bootstrap"`
 13. Start benchmark script
-    1. `cd bench && ./start.sh`
+    1. `cd ../..`
+    2. `cd bench && ./start.sh`
 14. Navigate to locust dashboard at http://0.0.0.0:8089/
     1. Start synthetic test with `10` users and spawn rate of `2`
     2. Make sure to enter host you got from output of `npm run cdk deploy`
