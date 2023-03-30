@@ -12,13 +12,13 @@ const momento = new SimpleCacheClient(authToken, defaultTtl, {
 
 export interface Client {
     createUser: (user: User) => Promise<void>
-    getCachedUser: (userId: string) => Promise<User>
-    getUser: (userId: string) => Promise<User>
+    getCachedUser: (userId: string) => Promise<User | null>
+    getUser: (userId: string) => Promise<User | null>
 }
 
 export interface DataClient {
     createUser: (user: User) => Promise<void>
-    getUser: (userId: string) => Promise<User>
+    getUser: (userId: string) => Promise<User | null>
 }
 
 export class DefaultClient implements Client {
@@ -32,13 +32,13 @@ export class DefaultClient implements Client {
         return this.dataClient.createUser(user);
     }
 
-    async getCachedUser(userId: string): Promise<User> {
+    async getCachedUser(userId: string): Promise<User | null> {
         let user = await getUserMomento(userId)
         if (!user) {
             console.log(`no user found in momento fetching from datastore id=${userId}`)
             user = await this.dataClient.getUser(userId)
             if (!user) {
-                throw new Error(`no user found for id=${userId}`)
+                return null
             }
             // Set item in cache so next time can get faster
             await momento.set("momento-demo-users", userId, JSON.stringify(user))
@@ -46,7 +46,7 @@ export class DefaultClient implements Client {
         return user
     }
 
-    async getUser(userId: string): Promise<User> {
+    async getUser(userId: string): Promise<User | null> {
         return this.dataClient.getUser(userId);
     }
 }

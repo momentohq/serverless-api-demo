@@ -4,6 +4,7 @@ import {Client as UserClient, DefaultClient} from "../repository/users/users";
 
 export class UserHandler {
     userStore: UserClient
+
     constructor(ur: UserClient) {
         this.userStore = ur;
     }
@@ -24,24 +25,30 @@ export class UserHandler {
         return returnUsers;
     }
 
-    async handleGetUser(userId: string): Promise<User> {
+    async handleGetUser(userId: string): Promise<User | null> {
         const user = await this.userStore.getUser(userId)
         // Remove profile pic from user api to cut down on bandwidth. Use GET /images/profile-pics instead
-        delete user.profile_pic
+        if (user) {
+            delete user.profile_pic
+        }
         return user
     }
 
-    async handleGetCachedUser(userId: string): Promise<User> {
+    async handleGetCachedUser(userId: string): Promise<User | null> {
         const user = await this.userStore.getCachedUser(userId)
         // Remove profile pic from user api to cut down on bandwidth. Use GET /images/profile-pics instead
-        delete user.profile_pic
+        if (user) {
+            delete user.profile_pic
+        }
         return user
     }
 
     async handleGetFollowers(userId: string): Promise<Array<string>> {
         let user = await this.userStore.getUser(userId)
-        // FIXME handle no user found
-        const returnUserPromises: Array<Promise<User>> = []
+        if (!user) {
+            throw new Error(`no user found userId=${userId}`);
+        }
+        const returnUserPromises: Array<Promise<User | null>> = []
         user.followers.forEach((u => {
             returnUserPromises.push(this.userStore.getUser(u))
         }))
@@ -50,11 +57,12 @@ export class UserHandler {
 
     async handleGetCachedFollowers(userId: string): Promise<Array<string>> {
         let user = await this.userStore.getCachedUser(userId)
-        // FIXME handle no user found
-
-        const returnUserPromises: Array<Promise<User>> = []
-        user.followers.forEach((f => {
-            returnUserPromises.push(this.userStore.getCachedUser(f))
+        if (!user) {
+            throw new Error(`no user found userId=${userId}`);
+        }
+        const returnUserPromises: Array<Promise<User | null>> = []
+        user.followers.forEach((followerId => {
+            returnUserPromises.push(this.userStore.getCachedUser(followerId))
         }))
 
         return resolveFollowersNames(returnUserPromises)
@@ -62,13 +70,17 @@ export class UserHandler {
 
     async handleGetProfilePic(userId: string): Promise<string | undefined> {
         let user = await this.userStore.getUser(userId)
-        // FIXME handle no user found
+        if (!user) {
+            throw new Error(`no user found userId=${userId}`);
+        }
         return user.profile_pic
     }
 
     async handleGetCachedProfilePic(userId: string): Promise<string | undefined> {
         let user = await this.userStore.getCachedUser(userId)
-        // FIXME handle no user found
+        if (!user) {
+            throw new Error(`no user found userId=${userId}`);
+        }
         return user.profile_pic
     }
 }

@@ -25,7 +25,7 @@ const customAuthLogic = async (authToken: string, methodArn: string, requestedUs
     // Now perform custom app Authz logic here were checking if the requesting user is a follower of the
     // requested profile pic owner based off path parameter in api for resource.
 
-    let user: undefined | User;
+    let user: null | User;
     if (process.env["CACHE_ENABLED"] === 'true') {
         user = await ur.getCachedUser(requestedUserId);
     } else {

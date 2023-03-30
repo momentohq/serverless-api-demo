@@ -2,10 +2,13 @@ import axios from "axios";
 
 export const maxTestUsersToMake = 100
 
-export async function resolveFollowersNames(userPromises: Array<Promise<User>>): Promise<Array<string>> {
+export async function resolveFollowersNames(userPromises: Array<Promise<User| null>>): Promise<Array<string>> {
     const u = await Promise.all(userPromises)
     const rList: Array<string> = []
     u.forEach(ur => {
+        if (ur == null){
+            throw new Error(`no user found for follower`);
+        }
         rList.push(ur.name)
     })
     return rList
